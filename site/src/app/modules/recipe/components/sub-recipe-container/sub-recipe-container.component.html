@@ -1,0 +1,18 @@
+<div *ngIf="editMode || (subRecipes && subRecipes.length > 0)">
+  <hr/>
+  <div *ngIf="subRecipes" class="w-100 mb-3">
+    <div *ngFor="let subRecipe of subRecipes; index as i" class="mb-3">
+      <cookbook-sub-recipe
+        [(subRecipe)]="subRecipes[i]"
+        [recipeId]="recipeId"
+        [editMode]="editMode"
+        (onDelete)="removeSubRecipe(i)"
+        (onTimeChange)="changeTime()">
+      </cookbook-sub-recipe>
+    </div>
+  </div>
+  <div *ngIf="editMode">
+    <button type="button" class="btn btn-primary mr-2" (click)="addSubRecipe()">Nuova sezione</button>
+    <button type="button" class="btn btn-primary" (click)="addExistingSubRecipe()">Aggiungi esistente</button>
+  </div>
+</div>

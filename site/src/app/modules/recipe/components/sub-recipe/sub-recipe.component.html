@@ -1,0 +1,104 @@
+<!-- <div class="row" *ngIf="editMode">
+  <div class="col-sm-12 col-md-2">
+    <label for="recipe-input" class="col-form-label">Ricetta:</label>
+    <br>
+    <cookbook-dropdown 
+      [(item)]="recipe" 
+      [newItemEnabled]="false" 
+      id="recipe-input" 
+      emptyText="Ricetta"
+      itemTypeName="ricetta" 
+      [dataObservable]="recipesObservable">
+    </cookbook-dropdown>
+  </div>
+  <div class="col-sm-12 col-md-3">
+    <label for="ingredient-input" class="col-form-label"> Scalata secondo l'ingrediente:</label>
+    <br>
+    <cookbook-dropdown 
+      [(item)]="ingredient" 
+      [newItemEnabled]="false" 
+      id="ingredient-input"
+      emptyText="Ingrediente" 
+      itemTypeName="ingrediente" 
+      [dataObservable]="ingredientsObservable"
+      [disabled]="recipe.id === undefined">
+    </cookbook-dropdown>
+  </div>
+  <div *ngIf="ingredient.id !== undefined" class="col-sm-12 col-md-4">
+    <label for="quantity-input" class="col-form-label">Quantità desiderata di {{ingredient.name}}:</label>
+    <br>
+    <input type="number" [(ngModel)]="quantity" id="quantity-input" [disabled]="ingredient.id === undefined">
+   TODO: {{ingredient.unit?.symbol ?? ''}}
+  </div>
+  <div *ngIf="editMode" class="col-sm-12 col-md-2">
+    <br>
+    <button class="btn btn-danger" (click)="delete()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+</div> -->
+<div *ngIf="errorStatus === 409" class="alert alert-danger">
+  <p>Errore: sotto ricetta già esistente</p>
+</div>
+
+<div *ngIf="errorStatus === 422" class="alert alert-danger">
+  <p>Errore: input non processabile</p>
+</div>
+<div class="container">
+  <div class="row mt-2 border border-primary rounded-lg p-2">
+    <div class="col-sm-12">
+
+      <h5 *ngIf="!editMode">{{subRecipe?.name}}</h5>
+      <h5 *ngIf="editMode" class="w-100 input-group h5">
+        <div class="input-group-prepend">
+          <label class="input-group-text" for="sub-recipe-name">Nome</label>
+        </div>
+        <input type="text" [(ngModel)]="subRecipe.name" placeholder="Nome" class="form-control" id="sub-recipe-name">
+        <div class="input-group-append">
+          <button *ngIf="editMode" class="btn btn-danger float-right" (click)="delete()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </h5>
+
+      <hr>
+      <div class="row">
+        <div class="col-sm-12 col-md-8">
+          <p *ngIf="!editMode">
+            <i>{{subRecipe?.desc}}</i>
+          </p>
+          <div *ngIf="editMode" class="input-group w-100">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="sub-recipe-description">Descrizione</label>
+            </div>
+            <input type="text" [(ngModel)]="subRecipe.desc" placeholder="Descrizione" class="form-control"
+              id="sub-recipe-description">
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-4">
+          <cookbook-time [editMode]="editMode" [time]="subRecipe.time" (timeChange)="changeTime($event)">
+          </cookbook-time>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="col-sm-12 col-md-4">
+      <div class="border border-primary rounded-lg p-2 w-100">
+        <h5>Ingredienti</h5>
+        <hr />
+        <cookbook-recipe-ingredients 
+          [recipeId]="recipeId" 
+          [subRecipeId]="subRecipe.id?.toString() ?? ''"
+          [editMode]="editMode">
+        </cookbook-recipe-ingredients>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-8">
+      <h5>Istruzioni</h5>
+      <hr />
+      <p *ngIf="!editMode">{{subRecipe?.instructions}}</p>
+      <textarea *ngIf="editMode" [(ngModel)]="subRecipe.instructions" class="w-100 form-control"
+        placeholder="Istruzioni"></textarea>
+    </div>
+  </div>
+</div>

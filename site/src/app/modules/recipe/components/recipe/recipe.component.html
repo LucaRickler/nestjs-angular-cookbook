@@ -1,0 +1,49 @@
+<div class="container" style="padding-top: 30px; padding-bottom: 30px;">
+  <div class="row">
+    <div class="col-sm-12">
+      <h3 *ngIf="!editMode">{{recipe?.title}}</h3>
+      <h3 *ngIf="editMode">
+        <input type="text" [(ngModel)]="recipe.title" placeholder="Titolo" class="w-100 border-0">
+      </h3>
+      <hr>
+    </div>
+    <div class="col-sm-12 col-md-10">
+      <p>
+        <i *ngIf="!editMode">{{recipe?.desc}}</i>
+        <input type="text" *ngIf="editMode" [(ngModel)]="recipe.desc" style="font-style: italic;"
+          placeholder="Descrizione" class="w-100 border-0">
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-2">
+      <div class="float-right btn-group">
+        <button class="btn btn-danger" *ngIf="!isNewRecipe()" (click)="delete()">Elimina</button>
+        <button class="btn btn-primary" *ngIf="!editMode" (click)="modify()">Modifica</button>
+        <button class="btn btn-secondary" *ngIf="editMode" (click)="cancelModify()">Annulla</button>
+        <button class="btn btn-success" *ngIf="editMode" (click)="save()">Salva</button>
+      </div>
+    </div>
+
+    <div class="alert alert-danger col-sm-12" *ngIf="errorStatus !== 0">
+      Errore: errore nel salvataggio
+    </div>
+
+    <div class="col-sm-12 col-md-4">
+      <cookbook-time 
+        [editMode]="false" 
+        [(time)]="recipe.time"
+        [canEdit]="false">
+      </cookbook-time>
+    </div>
+    <div class="col-sm-12  mt-3">
+      <cookbook-sub-recipe-container
+        #subRecipes
+        [editMode]="editMode"
+        [recipeId]="recipeId"
+        (onTimeChange)="changeTime($event)">
+      </cookbook-sub-recipe-container>   
+    </div>
+  </div>
+</div>
+<cookbook-modal-host #deleteHost [confirmEnabled]="true" [cancelEnabled]="true" title="Conferma elimina">
+  <p> Sicuro di voler cancellare la ricetta?</p>
+</cookbook-modal-host>

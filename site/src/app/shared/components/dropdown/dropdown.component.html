@@ -1,0 +1,25 @@
+<div class="input-group-append"ngbDropdown>
+  <button 
+    class="dropdown-toggle btn btn-primary" 
+    id="dropdownManual" 
+    ngbDropdownToggle 
+    [disabled]="disabled">
+    {{item?.name ?? emptyText}}
+  </button>
+  <div ngbDropdownMenu aria-labelledby="dropdownManual">
+    <div ngbDropdownItem disabled *ngIf="!hasData()">
+      Nessun {{itemTypeName}} trovato
+    </div>
+    <ng-container *ngIf="hasData()">
+      <ng-container  *ngFor="let item of items">
+        <button ngbDropdownItem (click)="selectItem(item)">
+          {{item?.name}}
+        </button>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngIf="newItemEnabled">
+      <div class="dropdown-divider"></div>
+      <button ngbDropdownItem (click)="newItem()">Nuovo {{itemTypeName}}</button>
+    </ng-container>
+  </div>
+</div>

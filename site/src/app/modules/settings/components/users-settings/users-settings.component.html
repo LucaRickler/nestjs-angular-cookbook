@@ -1,0 +1,55 @@
+<div class="container" style="padding-top: 30px; padding-bottom: 30px;">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Password</th>
+        <th scope="col">Admin</th>
+        <th scope="col">Azioni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users; index as i">
+        <td>{{user.username}}</td>
+        <td>{{user.email}}</td>
+        <td>****</td>
+        <td><input type="checkbox" class="" [(ngModel)]="users[i].admin" (change)="updateUser(i)"></td>
+        <td>
+          <div class="btn-group">
+            <button class="btn btn-danger float-left" (click)="deleteUser(i)" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="addingUser">
+        <td>
+          <input type="text" class="form-control" style="max-width: 200px;" [(ngModel)]="newUser.username">
+        </td>
+        <td>
+          <input type="email" class="form-control" style="max-width: 200px;" [(ngModel)]="newUser.email">
+        </td>
+        <td>
+          <input type="password" class="form-control" style="max-width: 200px;" [(ngModel)]="newUser.password">
+        </td>
+        <td>
+          <input type="checkbox" class="" [(ngModel)]="newUser.admin">
+        </td>
+        <td>
+          <div class="btn-group">
+            <button class="btn btn-primary" (click)="saveUser()">Salva</button>
+            <button class="btn btn-secondary" (click)="addingUser = false"> Annulla</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ngb-alert type="danger" [dismissible]="false" *ngIf="newUserError">
+    Utente non valido: non tutti i campi contengono valori validi
+  </ngb-alert>
+  <button class="btn btn-primary" (click)="addUser()">Nuovo Utente</button>
+</div>
+<cookbook-modal-host #deleteHost [confirmEnabled]="true" [cancelEnabled]="true" title="Conferma elimina">
+  <p> Sicuro di voler cancellare l'utente?</p>
+</cookbook-modal-host>

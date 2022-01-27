@@ -1,0 +1,43 @@
+<div class="w-100" *ngIf="editMode && canEdit">
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="time-cooking-input">Cottura: </label>
+    </div>
+    <input type="number" [(ngModel)]="time.cookingTime" class="form-control"
+      (change)="timeChange.emit(time)" id="time-cooking-input"> 
+    <div class="input-group-append">
+      <span class="input-group-text">minuti</span>
+    </div>
+  </div>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="time-prep-input">Preparazione: </label>
+    </div>
+    <input type="number" [(ngModel)]="time.prepTime" class="form-control"
+      (change)="timeChange.emit(time)" id="time-prep-input"> 
+    <div class="input-group-append">
+      <span class="input-group-text">minuti</span>
+    </div>
+  </div>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="time-resting-input">Riposo: </label>
+    </div>
+    <input type="number" [(ngModel)]="time.restingTime" class="form-control"
+      (change)="timeChange.emit(time)" id="time-resting-input"> 
+    <div class="input-group-append">
+      <span class="input-group-text">minuti</span>
+    </div>
+  </div>
+</div>
+<div class="w-100" *ngIf="!editMode && time.anyTime()">
+  <p *ngIf="time.cookingTime"><b>Tempo di cottura: </b>
+    <span *ngIf="!editMode">{{ time.cookingTime }} minuti</span>
+  </p>
+  <p *ngIf="time.prepTime"><b>Tempo di preparazione: </b>
+    <span *ngIf="!editMode">{{ time.prepTime }} minuti</span>
+  </p>
+  <p *ngIf="time.restingTime"><b>Tempo di riposo: </b>
+    <span *ngIf="!editMode">{{ time.restingTime }} minuti</span>
+  </p>
+</div>

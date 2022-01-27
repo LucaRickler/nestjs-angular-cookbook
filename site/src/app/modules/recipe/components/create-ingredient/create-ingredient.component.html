@@ -1,0 +1,29 @@
+<div class="form-group">
+  <label for="ingredient-name-input" class="col-form-label">Nome:</label>
+  <br>
+  <input type="text" [(ngModel)]="ingredient.name" id="ingredient-name-input" placeholder="Nome" class="form-control">
+</div>
+<div class="form-group">
+  <label for="ingredient-unit-input" class="col-form-label">Unità di misura:</label>
+  <br>
+  <cookbook-dropdown 
+    [(item)]="ingredient.unit" 
+    id="ingredient-unit-input" 
+    emptyText="Unità di misura"
+    itemTypeName="unità di misura" 
+    [dataObservable]="unitService.items" 
+    [newItemEnabled]="true"
+    (onNewItem)="newUnit()">
+  </cookbook-dropdown>
+</div>
+<cookbook-modal-host #modal title="Nuova unità di misura" [saveEnabled]="true">
+  <cookbook-create-unit #createUnit cookbookModalFeedback [captureItem]="createUnit.saveUnit()" ></cookbook-create-unit>
+</cookbook-modal-host>
+
+<div *ngIf="errorStatus === 409" class="alert alert-danger">
+  <p>Errore: unità di misura già esistente</p>
+</div>
+
+<div *ngIf="errorStatus === 422" class="alert alert-danger">
+  <p>Errore: input non processabile</p>
+</div>

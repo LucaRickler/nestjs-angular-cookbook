@@ -1,0 +1,38 @@
+<div class="w-100">
+  <ul *ngIf="!editMode">
+    <ng-container *ngFor="let ingredient of recipeIngredients; index as i">
+      <li >{{ingredient | ingredient: scaleFactor}}</li>
+    </ng-container>
+  </ul>
+  <ng-container *ngIf="editMode">
+    <ng-container *ngFor="let ingredient of recipeIngredients; index as i">
+      <div class="input-group w-100">
+        <input type="number" min="0" [(ngModel)]="recipeIngredients[i].quantity" class="form-control">
+        <div class="input-group-append">
+          <span class="input-group-text">{{ingredient.ingredient?.unit?.symbol ?? 'x'}}</span>
+        </div>
+        <cookbook-dropdown
+          class="input-group-append"
+          [(item)]="recipeIngredients[i].ingredient"
+          emptyText="Ingrediente"
+          itemTypeName="ingrediente"
+          [dataObservable]="ingredientService.items"
+          [newItemEnabled]="true"
+          (onNewItem)="newIngredient(i)">
+        </cookbook-dropdown>
+        <div class=input-group-append>
+          <button class="btn btn-danger" (click)="removeIngredient(i)" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <div>
+      <button class="btn btn-primary" (click)="addIngredient()">+</button>
+    </div>
+  </ng-container>
+</div>
+<cookbook-modal-host #modal title="Nuovo Ingrediente" [saveEnabled]="true">
+  <cookbook-create-ingredient #createIngredient cookbookModalFeedback [captureItem]="createIngredient.saveIngredient()">    
+  </cookbook-create-ingredient>
+</cookbook-modal-host>

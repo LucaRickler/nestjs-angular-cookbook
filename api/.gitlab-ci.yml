@@ -1,0 +1,180 @@
+stages:
+  - test
+  - dist-build
+  - image-build
+  - deploy
+
+.node-job:
+  image: node:16-alpine
+  before_script:
+    - npm cache verify --cache .npm
+    - npm ci --cache .npm --prefer-offline
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .npm/
+
+.node-test:
+  extends: .node-job
+
+unit-test:
+  extends: .node-test
+  stage: test
+  tags:
+    - test
+    - develop
+  script:
+    - npm run test:cov
+  coverage: /All\sfiles.*?\s+(\d+.\d+)/
+  interruptible: true
+  variables:
+    JWTSECRET: secret
+    JWTEXPIRE: 1
+  retry: 2
+
+test-e2e:
+  extends: .node-test
+  stage: test
+  tags:
+    - test
+    - develop
+  script:
+    - npm run test:e2e
+  coverage: /All\sfiles.*?\s+(\d+.\d+)/
+  interruptible: true
+  variables:
+    PORT: 3000
+    JWTSECRET: secret
+    JWTEXPIRE: 1
+    DB_HOST: 192.168.1.152
+    DB_PORT: 5432
+    DB_USERNAME: "user"
+    DB_PASSWORD: "secret"
+    DATABASE: test
+    DEBUG_MODE: "TRUE"
+    GQP_SCHEMA_FILE: schema.gql
+    GQL_SUBSCRIPTIONS_ACTIVE: "FALSE"
+  retry: 2
+
+build-dist:
+  extends: .node-job
+  stage: dist-build
+  tags:
+    - build
+    - develop
+  script:
+    - npm run build
+  artifacts:
+    untracked: false
+    expire_in: 1 days
+    paths:
+      - dist/
+  interruptible: true
+  only:
+    - develop
+    - master
+    - tags
+  retry: 2
+
+build-image-dev:
+  stage: image-build
+  tags:
+    - build
+    - develop
+  image: docker:19.03.8
+  services:
+    - docker:stable-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" --cache-from "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" --build-arg BUILDKIT_INLINE_CACHE=1 .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  cache:
+    untracked: false
+    policy: pull
+  only:
+    - develop
+    - tags
+  retry: 2
+
+build-image-prod:
+  stage: image-build
+  tags:
+    - build
+    - develop
+  image: docker:19.03.8
+  services:
+    - docker:stable-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" --cache-from "$CI_REGISTRY_IMAGE" --build-arg BUILDKIT_INLINE_CACHE=1 .
+    - docker push "$CI_REGISTRY_IMAGE"
+  cache:
+    policy: pull
+  only:
+    - master
+    # prod
+  retry: 2
+
+deploy-develop:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  environment:
+    name: develop
+    on_stop: stop-develop
+  script:
+    - ansible-playbook environments/install-develop.yml -e '{"registry_username":'$CI_REGISTRY_USER', "registry_password":'$CI_REGISTRY_PASSWORD'}'
+  when: manual
+  only:
+    - develop
+  cache:
+    policy: pull
+
+stop-develop:
+  stage: deploy
+  dependencies: []
+  tags:
+    - shell
+    - deploy
+    - develop
+  script: ansible-playbook environments/stop-develop.yml
+  when: manual
+  only:
+    - develop
+  environment:
+    name: develop
+    action: stop
+
+deploy-master:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  environment:
+    name: prod
+    on_stop: stop-master
+  script:
+    - ansible-playbook environments/install-master.yml -e '{"registry_username":'$CI_REGISTRY_USER', "registry_password":'$CI_REGISTRY_PASSWORD'}'
+  when: manual
+  only:
+    - master
+  cache:
+    policy: pull
+
+stop-master:
+  stage: deploy
+  dependencies: []
+  tags:
+    - shell
+    - deploy
+    - develop
+  script: ansible-playbook environments/stop-master.yml
+  when: manual
+  only:
+    - master
+  environment:
+    name: prod
+    action: stop

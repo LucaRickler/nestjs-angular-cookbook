@@ -1,0 +1,39 @@
+<nav class="fixed-top navbar navbar-dark navbar-expand-md bg-dark" style="min-height: 50px;">
+  <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" [attr.aria-expanded]="!isCollapsed"
+    aria-controls="navbar" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbar" [ngbCollapse]="isCollapsed">
+    <ul class="navbar-nav mx-auto">
+      <li class="nav-item text-center" *ngFor="let el of navs; index as i;">
+        <a class="nav-link" [routerLink]="navs[i].url" routerLinkActive="active" (click)="isCollapsed = !isCollapsed">
+          <b>{{ navs[i].title }}</b>
+        </a>
+      </li>
+    </ul>
+    <div class="float-right">
+      <button class="btn btn-primary mr-2" *ngIf="isLoggedIn()" (click)="newRecipe()">
+        <b>Nuova Ricetta</b>
+      </button>
+      <div ngbDropdown class="d-inline-block" *ngIf="isLoggedIn()">
+        <svg ngbDropdownToggle class="bg-light rounded-circle" width="38" height="38"
+          [data-jdenticon-value]="user.username"></svg>
+        <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right">
+          <div class="dropdown-item-text">
+            <small>Utente attuale:</small>
+            <br />
+            <b>{{user.username}}</b>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a ngbDropdownItem [routerLink]="['settings', {outlets: {settings: ['account']}}]">Impostazioni</a>
+          <a ngbDropdownItem *ngIf="user.admin"
+            [routerLink]="['/settings', {outlets: {settings: ['users']}}]">Amministrazione</a>
+          <div class="dropdown-divider"></div>
+          <button ngbDropdownItem (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" *ngIf="!isLoggedIn()" (click)="login()">login</button>
+  </div>
+</nav>

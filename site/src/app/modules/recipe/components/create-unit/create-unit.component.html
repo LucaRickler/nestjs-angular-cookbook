@@ -1,0 +1,18 @@
+<div class="form-group">
+  <label for="unit-name-input" class="col-form-label">Nome:</label>
+  <br>
+  <input type="text" [(ngModel)]="unit.name" id="unit-name-input" placeholder="Nome" class="form-control">
+</div>
+<div class="form-group">
+  <label for="unit-symbol-input" class="col-form-label">Simbolo:</label>
+  <br>
+  <input type="text" [(ngModel)]="unit.symbol" id="unit-symbol-input" placeholder="Simbolo" class="form-control">
+</div>
+
+<div *ngIf="errorStatus === 409" class="alert alert-danger">
+  <p>Errore: unità di misura già esistente</p>
+</div>
+
+<div *ngIf="errorStatus === 422" class="alert alert-danger">
+  <p>Errore: input non processabile</p>
+</div>

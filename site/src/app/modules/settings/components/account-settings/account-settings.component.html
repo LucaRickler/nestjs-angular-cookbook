@@ -1,0 +1,48 @@
+<div class="container" style="padding-top: 30px; padding-bottom: 30px;">
+  <div class="d-flex align-items-center w-100 flex-column">
+    <svg class="bg-light rounded-circle" width="100" height="100" [data-jdenticon-value]="user.username"></svg>
+    <h4>{{user.username}}</h4>
+  </div>
+  <div>
+    <h4>Dettagli Account</h4>
+  </div>
+  <ngb-alert type="success" [dismissible]="false" *ngIf="saveSuccess">
+    Modifiche salvate con successo
+  </ngb-alert>
+  <!-- <div class="input-group mb-2">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Username</span>
+    </div>
+    <input class="form-control" type="text" [(ngModel)]="username" [placeholder]="user.username">
+  </div> -->
+
+  <div class="input-group mb-2">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Email</span>
+    </div>
+    <input class="form-control" type="text" [(ngModel)]="email" [placeholder]="user.email">
+  </div>
+
+  <div class="input-group mb-2">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Password</span>
+    </div>
+    <input class="form-control" type="password" [(ngModel)]="newPassword" placeholder="********">
+  </div>
+
+  <div class="input-group mb-2">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Conferma Password</span>
+    </div>
+    <input class="form-control" type="password" [(ngModel)]="newPasswordConfirm" placeholder="********">
+  </div>
+  <ngb-alert type="danger" *ngIf="passwordMismatch" [dismissible]="false">
+    Errore: le due password sono diverse
+  </ngb-alert>
+
+  <p>
+    <b>Nota: </b>i campi vuoti non saranno modificati
+  </p>
+
+  <button class="btn btn-success float-right" [disabled]="saveDisabled()" (click)="updateUser()">Salva modifiche</button>
+</div>

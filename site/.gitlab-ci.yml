@@ -1,0 +1,104 @@
+
+stages:
+  - image-build
+  - deploy
+
+build-image-dev:
+  stage: image-build
+  tags:
+    - build
+    - develop
+  image: docker:19.03.8
+  services:
+    - docker:stable-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" --cache-from "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" --build-arg BUILDKIT_INLINE_CACHE=1 .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  cache:
+    untracked: false
+    policy: pull
+  only:
+    - develop
+    - tags
+  retry: 2
+
+build-image-prod:
+  stage: image-build
+  tags:
+    - build
+    - develop
+  image: docker:19.03.8
+  services:
+    - docker:stable-dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" --cache-from "$CI_REGISTRY_IMAGE" --build-arg BUILDKIT_INLINE_CACHE=1 .
+    - docker push "$CI_REGISTRY_IMAGE"
+  cache:
+    policy: pull
+  only:
+    - master
+  retry: 2
+
+deploy-develop:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  environment:
+    name: develop
+    on_stop: stop-develop
+  script:
+    - ansible-playbook install/develop-install.yml -e "registry_username=$CI_REGISTRY_USER registry_password=$CI_REGISTRY_PASSWORD"
+  when: manual
+  only:
+    - develop
+  cache:
+    policy: pull
+
+stop-develop:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  script: ansible-playbook install/develop-stop.yml
+  when: manual
+  only:
+    - develop
+  environment:
+    name: develop
+    action: stop
+
+deploy-master:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  environment:
+    name: prod
+    on_stop: stop-master
+  script:
+    - ansible-playbook install/master-install.yml -e "registry_username=$CI_REGISTRY_USER registry_password=$CI_REGISTRY_PASSWORD"
+  when: manual
+  only:
+    - master
+  cache:
+    policy: pull
+
+stop-master:
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+    - develop
+  script: ansible-playbook install/master-stop.yml
+  when: manual
+  only:
+    - master
+  environment:
+    name: prod
+    action: stop

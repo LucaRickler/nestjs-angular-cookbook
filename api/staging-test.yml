@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  nestjs-template:
+    image: <my-personal-container-registry>/templates/nestjs-server:develop
+    environment:
+      GQP_SCHEMA_FILE: schema.gql
+      GQL_SUBSCRIPTIONS_ACTIVE: "FALSE"
+      PORT: 3001
+      DEBUG_MODE: "TRUE"
+      DB_HOST: 192.168.1.150
+      DB_PORT: 5432
+      DB_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+      DB_USERNAME: /run/secrets/POSTGRES_USER
+      DATABASE: /run/secrets/POSTGRES_DB
+      JWTSECRET: /run/secrets/JWT_SECRET_KEY
+      JWTEXPIRE: /run/secrets/JWT_EXPIRE
+    secrets:
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_DB
+      - JWT_SECRET_KEY
+      - JWT_EXPIRE
+    ports:
+      - 3001:3001
+    networks:
+      - database
+    deploy:
+      placement:
+        constraints:
+          - node.labels.gitlab-ci == false
+
+secrets:
+  POSTGRES_PASSWORD:
+    external: true
+  POSTGRES_USER:
+    external: true
+  POSTGRES_DB:
+    external: true
+  JWT_EXPIRE:
+    external: true
+  JWT_SECRET_KEY:
+    external: true
+
+networks:
+  database:

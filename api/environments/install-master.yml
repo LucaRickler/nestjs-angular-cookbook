@@ -1,0 +1,25 @@
+- name: Install - cookbook-api
+  hosts:
+    - <production-environment>
+  vars:
+    - sync_active: false
+  become: true
+  remote_user: pi
+  tasks:
+  - name: Kill Process
+    shell: docker stop cookbook-api && docker rm cookbook-api
+    become: true
+    ignore_errors: yes
+
+  - name: Pull
+    become: true
+    shell: "docker login -u {{ registry_username }} -p {{ registry_password }} <my-personal-container-registry> && docker pull <my-personal-container-registry>/cookbook/api"
+  
+  - name: Restarting Process
+    become: true
+    shell: "docker run --name cookbook-api \
+      --network cookbook \
+      -e DATABASE='cookbook' -e DB_HOST='postgres' \
+      -e DB_USERNAME='postgres' -e DB_PASSWORD='secret' \
+      -e JWTEXPIRE='180' --restart=unless-stopped -d \
+      <my-personal-container-registry>/cookbook/api"

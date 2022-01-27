@@ -1,0 +1,11 @@
+- name: Stop cookbook-site
+  hosts:
+    - <develop-environment>
+  become: true
+  remote_user: pi
+  tasks:
+  - name: Kill Process
+    shell: docker stop cookbook-site && docker rm cookbook-site
+    become: true
+    ignore_errors: yes
+

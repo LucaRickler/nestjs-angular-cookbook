@@ -1,0 +1,57 @@
+[{
+    "name": "local",
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "postgres",
+    "password": "secret",
+    "database": "test",
+    "entities": ["src/**/*.entity.ts"],
+    "migrations": ["src/migration/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration"
+    }
+  },
+  {
+    "name": "test",
+    "type": "postgres",
+    "host": "192.168.1.152",
+    "port": 5432,
+    "username": "user",
+    "password": "secret",
+    "database": "test",
+    "entities": ["src/**/*.entity.ts"],
+    "migrations": ["src/migration/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration"
+    }
+  },
+  {
+    "name": "develop",
+    "type": "postgres",
+    "host": "192.168.1.152",
+    "port": 5432,
+    "username": "user",
+    "password": "secret",
+    "database": "cookbook-develop",
+    "entities": ["src/**/*.entity.ts"],
+    "migrations": ["src/migration/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration"
+    }
+  },
+  {
+    "name": "master",
+    "type": "postgres",
+    "host": "postgres",
+    "port": 5432,
+    "username": "user",
+    "password": "secret",
+    "database": "cookbook",
+    "entities": ["src/**/*.entity.ts"],
+    "migrations": ["src/migration/*.ts"],
+    "cli": {
+      "migrationsDir": "src/migration"
+    }
+  }
+]
